@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSI Trade | Trading Dashboard</title>
+<meta name="description" content="TSI Trade market dashboard and deposit portal.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#182239;--line:#26334c;--text:#edf3ff;--muted:#91a0bb;--green:#20d6a0;--red:#ff647c;--gold:#f2bf55;--blue:#6d9cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0%,#172544 0%,var(--bg) 45%);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700}button:disabled{opacity:.45;cursor:not-allowed}
+.app{max-width:1440px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#f5cc6a,#b77b23);display:grid;place-items:center;color:#101522;font-weight:900;font-size:20px;box-shadow:0 8px 28px #d9a83c30}.brand h1{font-size:19px;margin:0;letter-spacing:.5px}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:1.4px}.topright{display:flex;align-items:center;gap:10px}.pill{border:1px solid var(--line);background:#111a2c;padding:7px 11px;border-radius:999px;color:var(--muted);font-size:12px}.pill b{color:var(--gold)}.btn-primary{background:var(--gold);color:#171b24}.btn-secondary{background:#263451;color:#e9f0ff}.btn-danger{background:#4b2534;color:#ffb8c4}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.card{background:linear-gradient(180deg,#141e33,#11192a);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 14px 40px #00000012}.statlabel{color:var(--muted);font-size:12px;margin-bottom:8px}.statvalue{font-size:24px;font-weight:750;letter-spacing:-.6px}.sub{color:var(--muted);font-size:11px;margin-top:6px}.positive{color:var(--green)}.negative{color:var(--red)}
+.chartcard{padding:0;overflow:hidden}.charthead{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.charttitle{font-size:15px;font-weight:750}.chartmeta{font-size:12px;color:var(--muted);margin-top:3px}.charttools{display:flex;gap:8px;align-items:center}.select{background:#1b2941;color:var(--text);border:1px solid #30415f;border-radius:9px;padding:9px 10px;max-width:150px}.tv{height:490px;width:100%;background:#0b1220}.tv iframe{width:100%;height:100%;border:0}.chartfoot{display:flex;justify-content:space-between;padding:11px 16px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+.side{display:flex;flex-direction:column;gap:16px}.bothead{display:flex;justify-content:space-between;align-items:center}.botname{font-weight:750;font-size:15px}.status{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:11px}.dot{width:7px;height:7px;background:currentColor;border-radius:50%;box-shadow:0 0 12px currentColor}.botdesc{color:var(--muted);font-size:12px;margin:9px 0 14px}.botbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.buy{background:#0d674f;color:#c9ffeb}.sell{background:#7b2d43;color:#ffe0e7}.start{width:100%;margin-top:10px;background:var(--gold);color:#161a24}.stop{width:100%;margin-top:10px;background:#2a354c;color:#dce6fb}
+.progressrow{display:flex;justify-content:space-between;font-size:12px;margin:12px 0 8px}.progress{height:8px;border-radius:100px;background:#27344b;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#17b98a,#73e7bf);width:0%;border-radius:100px;transition:width .3s}
+.sectiontitle{font-weight:750;font-size:14px;margin:0 0 14px}.trade-list{display:flex;flex-direction:column;gap:9px;max-height:250px;overflow:auto}.trade{background:#0e1728;border:1px solid #202d43;border-radius:11px;padding:10px}.trade-top{display:flex;justify-content:space-between;font-weight:700}.trade-bottom{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:6px}.empty{color:var(--muted);text-align:center;padding:24px 6px;font-size:12px}
+.auth{position:fixed;inset:0;background:#060a13d9;backdrop-filter:blur(8px);display:grid;place-items:center;z-index:20;padding:18px}.authbox{width:min(440px,100%);background:#141e32;border:1px solid #31405b;border-radius:20px;padding:24px;box-shadow:0 30px 100px #0008}.authbox h2{margin:0 0 6px}.authbox p{color:var(--muted);font-size:12px;margin:0 0 18px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label{font-size:12px;color:#b9c6dc}.field input{background:#0b1323;border:1px solid #2a3953;color:white;border-radius:10px;padding:12px;outline:none}.field input:focus{border-color:var(--blue)}.authactions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.authmsg{font-size:12px;color:var(--gold);margin-top:12px;min-height:18px}.hidden{display:none!important}.notice{border:1px solid #57492b;background:#2a2416;color:#e7d6a3;padding:10px 12px;border-radius:11px;font-size:11px;margin-bottom:16px}.footnote{color:#72819c;font-size:10px;text-align:center;margin:18px 0 4px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr)}.tv{height:420px}}
+@media(max-width:600px){.app{padding:12px}.top{align-items:flex-start}.topright{flex-direction:column;align-items:flex-end}.stats{gap:8px}.statvalue{font-size:20px}.side{display:flex}.charthead{align-items:flex-start;flex-direction:column}.charttools{width:100%}.select{flex:1;max-width:none}.tv{height:360px}.chartfoot{gap:10px;flex-wrap:wrap}}
+
+.navbtn{background:#263451;color:#e9f0ff}.navbtn.active{background:var(--gold);color:#171b24}
+.page{display:block}.deposit-wrap{max-width:620px;margin:24px auto}.deposit-intro{color:var(--muted);font-size:13px;margin:-6px 0 20px}.deposit-field{display:flex;flex-direction:column;gap:7px;margin:16px 0}.deposit-field label{font-size:12px;color:#b9c6dc}.deposit-field input,.deposit-field select{width:100%;background:#0b1323;border:1px solid #2a3953;color:white;border-radius:10px;padding:13px;outline:none}.deposit-field input:focus,.deposit-field select:focus{border-color:var(--blue)}.deposit-summary{background:#0e1728;border:1px solid #26334c;border-radius:12px;padding:14px;margin:18px 0;color:var(--muted);font-size:13px}.deposit-summary strong{color:var(--text)}.deposit-proceed{width:100%;background:var(--gold);color:#171b24;padding:13px}.backbtn{background:#263451;color:#e9f0ff;margin-bottom:14px}
+@media(max-width:600px){.top{flex-wrap:wrap}.topright{flex-direction:row;flex-wrap:wrap;align-items:center}.topright .pill{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="brand"><div class="mark">TSI</div><div><h1>TSI TRADE</h1><small>MARKET INTELLIGENCE</small></div></div>
+ <div class="topright"><span class="pill" id="accountBadge">Account <b>CONNECTED</b></span><button id="dashboardNav" class="navbtn active">Dashboard</button><button id="depositNav" class="navbtn">Deposit</button><button id="authToggle" class="btn-secondary">Login</button><button id="logout" class="btn-secondary hidden">Sign out</button></div>
+</header>
+<div id="dashboardPage" class="page">
+ <section class="stats">
+  <div class="card"><div class="statlabel">Trading Capital</div><div class="statvalue" id="capital">$0.00</div><div class="sub" id="capitalSub">Capital loaded from your Supabase account settings</div></div>
+  <div class="card"><div class="statlabel">Account</div><div class="statvalue" id="accountState">Not signed in</div><div class="sub">Your account settings are managed from your backend</div></div>
+  <div class="card"><div class="statlabel">Daily P/L</div><div class="statvalue positive" id="dailyProfit">$0.00</div><div class="sub">Profit added to your displayed capital</div></div>
+  <div class="card"><div class="statlabel">Daily Target</div><div class="statvalue" id="dailyPercent">0.0% / 15%</div><div class="sub">Bot stops when the target is reached</div></div>
+ </section>
+ <section class="card" style="margin-bottom:16px">
+  <div class="bothead"><div><div class="botname">TSI Trading Bot</div><div class="chartmeta" id="botStatus">Stopped</div></div><span class="status" id="botStatusPill"><span class="dot"></span> READY</span></div>
+  <p class="botdesc">Start the bot to generate randomly simulated positive position results. It will stop when the daily target reaches 15% of the starting capital.</p>
+  <div class="progressrow"><span>Daily target progress</span><strong id="progressText">0.0%</strong></div>
+  <div class="progress"><span id="targetProgress"></span></div>
+  <button class="start" id="startBot">Start bot</button><button class="stop" id="stopBot" disabled>Stop bot</button>
+  <div class="sub" id="botMessage" aria-live="polite">Sign in and load your account capital before starting.</div>
+ </section>
+ <section class="card" style="margin-bottom:16px"><h3 class="sectiontitle">Position activity</h3><div class="trade-list" id="tradeList"><div class="empty">No positions yet</div></div></section>
+ <section class="card chartcard">
+  <div class="charthead"><div><div class="charttitle" id="chartPair">XAUUSD · Gold / US Dollar</div><div class="chartmeta">Market chart provided by TradingView</div></div><div class="charttools"><select id="symbol" class="select"><option value="OANDA:XAUUSD">XAUUSD</option><option value="OANDA:EURUSD">EURUSD</option><option value="OANDA:GBPUSD">GBPUSD</option><option value="OANDA:USDJPY">USDJPY</option><option value="NASDAQ:AAPL">AAPL</option><option value="NASDAQ:MSFT">MSFT</option><option value="NYSE:TSLA">TSLA</option></select><select id="interval" class="select"><option value="5">5m</option><option value="15">15m</option><option value="60" selected>1h</option><option value="240">4h</option><option value="D">1D</option></select></div></div>
+  <div class="tv" id="tv"></div><div class="chartfoot"><span>Chart source: TradingView</span><span>Market data display</span></div>
+ </section>
+</div>
+<section id="depositPage" class="page hidden">
+ <div class="deposit-wrap card">
+  <button class="backbtn" id="backDashboard">← Back to dashboard</button>
+  <h2 style="margin:4px 0 10px">Make a Deposit</h2>
+  <p class="deposit-intro">Enter the amount and investment duration. Continue to Telegram to send your deposit request.</p>
+  <div class="deposit-field"><label for="depositAmount">Amount</label><input id="depositAmount" type="number" min="1" step="0.01" placeholder="Enter amount"></div>
+  <div class="deposit-field"><label for="depositDuration">Duration</label><select id="depositDuration"><option value="1 day">1 day</option><option value="7 days">7 days</option><option value="14 days">14 days</option><option value="30 days" selected>30 days</option><option value="60 days">60 days</option><option value="90 days">90 days</option></select></div>
+  <div class="deposit-summary">Deposit amount: <strong id="depositAmountPreview">Not entered</strong><br>Duration: <strong id="depositDurationPreview">30 days</strong></div>
+  <button class="deposit-proceed" id="proceedTelegram">Proceed to Telegram</button>
+ </div>
+</section>
+<div class="footnote">TSI Trade<br><br>DEMO MODE: Bot activity and profit figures below are randomly simulated for demonstration only. They are not real trades, broker executions, or withdrawable earnings.</div>
+</div>
+<div class="auth" id="authModal">
+  <div class="authbox"><h2>Welcome to TSI Trade</h2><p>Sign in to load your Supabase account settings and trading dashboard.</p>
+    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
+    <div class="authactions"><button class="btn-primary" id="loginBtn">Login</button><button class="btn-secondary" id="signupBtn">Create account</button></div>
+    <div class="authmsg" id="authMsg"></div>
+    <div class="sub">Create an account with your email and a password of at least 8 characters. If email confirmation is enabled, check your inbox and verify before logging in.</div>
+  </div>
+</div>
+
+<script>
+// Keep your existing Supabase project connection and public anon/publishable key.
+const SUPABASE_URL = "https://egpzycadibvudyfriphk.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_6rFNkEY_zSKzzUUvD3Xnzg_RIKd2Xqx";
+const supabaseReady = SUPABASE_URL.startsWith("https://") && !!window.supabase?.createClient;
+const sb = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}) : null;
+let user=null, config={initial_capital:0,daily_target_percent:15,bot_enabled:false,symbol:"OANDA:XAUUSD"};
+const $=id=>document.getElementById(id);
+function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(Number(n)||0)}
+function loadChart(){const symbol=$("symbol").value, interval=$("interval").value;$("chartPair").textContent=symbol.replace("OANDA:","")+" · Market chart";$("tv").innerHTML=`<iframe title="TradingView market chart" src="https://www.tradingview.com/widgetembed/?frameElementId=tvframe&symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hideideas=1&locale=en" allowfullscreen></iframe>`}
+function updateUI(){
+ $("capital").textContent=money(config.initial_capital);
+ $("capitalSub").textContent=user?"Loaded from your Supabase account settings":"Sign in to load your account capital";
+ $("accountState").textContent=user?"Connected":"Not signed in";
+ $("accountBadge").innerHTML=user?"Account <b>CONNECTED</b>":"Account <b>OFFLINE</b>";
+}
+async function loadAccount(){
+ if(!sb||!user)return;
+ const {data,error}=await sb.from("account_config").select("initial_capital,daily_target_percent,bot_enabled,symbol").eq("user_id",user.id).maybeSingle();
+ if(error){console.warn(error);$("authMsg").textContent="Signed in, but account settings could not be loaded. Check your Supabase table and RLS policies.";return}
+ if(!data){config={...config,initial_capital:0};}
+ else{config={...config,...data};}
+ if(config.symbol&&[...$("symbol").options].some(o=>o.value===config.symbol))$("symbol").value=config.symbol;
+ startingCapital=Number(config.initial_capital)||0;updateUI();updatePositionUI();loadChart();
+}
+async function auth(action){
+ if(!sb){$("authMsg").textContent="Supabase could not load. Check your internet connection and project configuration.";return}
+ const email=$("email").value.trim(),password=$("password").value;
+ if(!email){$("authMsg").textContent="Enter your email address.";return}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$("authMsg").textContent="Enter a valid email address.";return}
+ if(!password){$("authMsg").textContent="Enter a password.";return}
+ if(action==="signup"&&password.length<8){$("authMsg").textContent="Use a password with at least 8 characters.";return}
+ $("loginBtn").disabled=true;$("signupBtn").disabled=true;$("authMsg").textContent=action==="signup"?"Creating account…":"Signing in…";
+ try{
+  let result=action==="signup"?await sb.auth.signUp({email,password,options:{emailRedirectTo:"https://tsi-hire.github.io/tsi-trade/"}}):await sb.auth.signInWithPassword({email,password});
+  if(result.error){$("authMsg").textContent=result.error.message||"Authentication failed.";return}
+  if(action==="signup"&&!result.data.session){$("authMsg").textContent="Account created! Check your email and verify it, then log in.";return}
+  user=result.data.user;$("authModal").classList.add("hidden");$("authToggle").classList.add("hidden");$("logout").classList.remove("hidden");await loadAccount();
+ }catch(err){console.error(err);$("authMsg").textContent=err?.message||"Could not connect to Supabase."}
+ finally{$("loginBtn").disabled=false;$("signupBtn").disabled=false}
+}
+// Random simulated position display. This does not connect to a broker or execute orders.
+const DAILY_TARGET_PERCENT=15;
+let botTimer=null, dailyProfit=0, positionCount=0, startingCapital=0;
+let profitDay=new Date().toISOString().slice(0,10);
+try{const saved=JSON.parse(localStorage.getItem("tsi_position_state")||"null");if(saved&&saved.day===profitDay){dailyProfit=Number(saved.profit)||0;positionCount=Number(saved.count)||0;startingCapital=Number(saved.startCapital)||0;}}catch(_e){}
+function savePositionState(){try{localStorage.setItem("tsi_position_state",JSON.stringify({day:profitDay,profit:dailyProfit,count:positionCount,startCapital:startingCapital}));}catch(_e){}}
+function resetPositionDay(){const today=new Date().toISOString().slice(0,10);if(today!==profitDay){profitDay=today;dailyProfit=0;positionCount=0;startingCapital=Number(config.initial_capital)||0;$("tradeList").innerHTML='<div class="empty">No positions yet</div>';savePositionState();updatePositionUI();}}
+function updatePositionUI(){const base=Number(config.initial_capital)||0;const cap=startingCapital||base;const pct=cap>0?(dailyProfit/cap)*100:0;const shown=Math.min(pct,DAILY_TARGET_PERCENT);$("capital").textContent=money(base+dailyProfit);$("capitalSub").textContent=user?"Account capital including today's position results":"Sign in to load your account capital";$("dailyProfit").textContent=money(dailyProfit);$("dailyPercent").textContent=`${shown.toFixed(1)}% / ${DAILY_TARGET_PERCENT}%`;$("progressText").textContent=`${shown.toFixed(1)}%`;$("targetProgress").style.width=`${Math.min(100,(shown/DAILY_TARGET_PERCENT)*100)}%`;$("dailyProfit").classList.toggle("positive",dailyProfit>=0);savePositionState();}
+function stopBot(reason="Bot stopped."){if(botTimer){clearTimeout(botTimer);botTimer=null;}$("startBot").disabled=false;$("stopBot").disabled=true;$("botStatus").textContent=reason;$("botStatusPill").innerHTML='<span class="dot"></span> STOPPED';}
+function addPosition(){resetPositionDay();const cap=startingCapital||Number(config.initial_capital)||0;if(!user){stopBot("Sign in required.");$("botMessage").textContent="Sign in to start the bot.";return}if(cap<=0){stopBot("Capital required.");$("botMessage").textContent="Your account capital is zero. Set initial_capital in account_config first.";return}
+ const target=cap*DAILY_TARGET_PERCENT/100;const remaining=target-dailyProfit;if(remaining<=0){dailyProfit=target;updatePositionUI();stopBot("Daily target reached · 15.0%.");$("botMessage").textContent="The 15% daily target has been reached. The bot has stopped for today.";return}
+ const gain=Math.min(remaining,cap*(0.001+Math.random()*0.004));dailyProfit+=gain;positionCount++;const row=document.createElement("div");row.className="trade";row.innerHTML=`<div class="trade-top"><span>Position ${positionCount}</span><span class="positive">+${money(gain)}</span></div><div class="trade-bottom"><span>Position result</span><span>${new Date().toLocaleTimeString()}</span></div>`;const list=$("tradeList");if(positionCount===1)list.innerHTML="";list.prepend(row);updatePositionUI();
+ if(dailyProfit>=target-0.000001){dailyProfit=target;updatePositionUI();stopBot("Daily target reached · 15.0%.");$("botMessage").textContent="15% daily target reached. The bot is now stopped for today.";return}
+ botTimer=setTimeout(addPosition,2500+Math.random()*2500);
+}
+$("startBot").onclick=()=>{resetPositionDay();if(!user){$("botMessage").textContent="Please log in first.";return}if((Number(config.initial_capital)||0)<=0){$("botMessage").textContent="No trading capital found. Set initial_capital in your Supabase account_config row.";return}if(botTimer)return;startingCapital=startingCapital||Number(config.initial_capital);$("startBot").disabled=true;$("stopBot").disabled=false;$("botStatus").textContent="Running";$("botStatusPill").innerHTML='<span class="dot"></span> RUNNING';$("botMessage").textContent="Positions are being generated at random. This does not place real orders.";addPosition();};
+$("stopBot").onclick=()=>{stopBot();$("botMessage").textContent="You stopped the bot.";};
+function showPage(page){const deposit=page==="deposit";$("dashboardPage").classList.toggle("hidden",deposit);$("depositPage").classList.toggle("hidden",!deposit);$("dashboardNav").classList.toggle("active",!deposit);$("depositNav").classList.toggle("active",deposit)}
+$("loginBtn").onclick=()=>auth("login");$("signupBtn").onclick=()=>auth("signup");$("authToggle").onclick=()=>$("authModal").classList.remove("hidden");
+$("logout").onclick=async()=>{stopBot("Signed out · Bot stopped.");if(sb)await sb.auth.signOut();user=null;config.initial_capital=0;$("logout").classList.add("hidden");$("authToggle").classList.remove("hidden");$("authModal").classList.remove("hidden");updateUI()};
+$("dashboardNav").onclick=()=>showPage("dashboard");$("depositNav").onclick=()=>showPage("deposit");$("backDashboard").onclick=()=>showPage("dashboard");
+$("symbol").onchange=loadChart;$("interval").onchange=loadChart;
+function updateDepositPreview(){const amount=Number($("depositAmount").value);$("depositAmountPreview").textContent=amount>0?money(amount):"Not entered";$("depositDurationPreview").textContent=$("depositDuration").value}
+$("depositAmount").oninput=updateDepositPreview;$("depositDuration").onchange=updateDepositPreview;
+$("proceedTelegram").onclick=()=>{const amount=Number($("depositAmount").value),duration=$("depositDuration").value;if(!Number.isFinite(amount)||amount<=0){alert("Please enter a valid deposit amount.");return}const message=`Hello TSI Hire, I would like to make a deposit.\nAmount: ${money(amount)}\nDuration: ${duration}`;window.open(`https://t.me/tsi_hire?text=${encodeURIComponent(message)}`,"_blank","noopener")};
+loadChart();updateUI();updatePositionUI();updateDepositPreview();
+if(sb)sb.auth.getSession().then(async({data})=>{if(data.session){user=data.session.user;$("authModal").classList.add("hidden");$("authToggle").classList.add("hidden");$("logout").classList.remove("hidden");await loadAccount()}});
+</script>
+</body>
+</html>
