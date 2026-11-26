@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSI Trade | Market Dashboard</title>
+<meta name="description" content="TSI Trade market dashboard and deposit portal.">
+<style>
+:root{--bg:#0b1020;--panel:#141e33;--panel2:#182239;--line:#293751;--text:#edf3ff;--muted:#9aa9c2;--gold:#f2bf55;--green:#20d6a0;--blue:#6d9cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0%,#1b2b4d 0%,var(--bg) 52%);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1440px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.mark{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#ffe39a,#bd872c);display:grid;place-items:center;color:#151a24;font-weight:900;font-size:20px}.brand h1{font-size:19px;margin:0}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.8px}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav button{border:1px solid var(--line);background:#17233b;color:var(--text);padding:10px 16px;border-radius:10px;font-weight:700}.nav button.active,.primary{background:var(--gold);color:#171b24;border-color:var(--gold)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}.card{background:linear-gradient(180deg,#17233b,#111a2c);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 14px 40px #0002}.chartcard{padding:0;overflow:hidden}.charthead{padding:17px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.charttitle{font-size:16px;font-weight:800}.muted{color:var(--muted)}.charttools{display:flex;gap:8px}.select,.control{background:#0b1425;color:var(--text);border:1px solid #34445f;border-radius:10px;padding:10px 12px;min-width:0}.tv{height:520px;width:100%;background:#0b1220}.tv iframe{width:100%;height:100%;border:0}.side{display:flex;flex-direction:column;gap:16px}.sectiontitle{font-size:15px;margin:0 0 10px}.market-note{font-size:13px;color:var(--muted);margin:0}.symbol-list{display:grid;gap:9px}.symbol-item{display:flex;justify-content:space-between;padding:10px;background:#0d1729;border:1px solid #263651;border-radius:10px;font-size:13px}.deposit-wrap{max-width:600px;margin:20px auto}.deposit-card{padding:28px}.eyebrow{color:var(--gold);font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase}h2{font-size:28px;line-height:1.2;margin:9px 0}.intro{color:var(--muted);font-size:13px;margin:0 0 24px}.field{margin:18px 0}.field label{display:block;font-size:13px;color:#c7d2e6;margin-bottom:8px;font-weight:650}.control{width:100%;padding:14px}.amount-wrap{position:relative}.currency{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:800}.amount-wrap input{padding-left:32px}.summary{background:#0d1729;border:1px solid #263651;border-radius:13px;padding:14px;margin:22px 0}.summary-row{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}.summary-row strong{color:var(--text);font-variant-numeric:tabular-nums}.summary-row+.summary-row{margin-top:8px}.proceed{width:100%;border:0;border-radius:12px;padding:15px;background:linear-gradient(135deg,#ffe39a,var(--gold));color:#171b24;font-weight:850;font-size:15px}.hint{font-size:11px;color:var(--muted);margin:14px 0 0;text-align:center}.error{color:#ff9ba9;font-size:12px;min-height:18px;margin-top:8px}.footnote{color:#71819d;font-size:11px;text-align:center;margin:20px 0 4px}.hidden{display:none!important}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.tv{height:440px}}
+@media(max-width:600px){.app{padding:13px}.top{align-items:flex-start;flex-direction:column}.nav{width:100%}.nav button{flex:1}.charthead{align-items:flex-start;flex-direction:column}.charttools{width:100%}.select{flex:1}.tv{height:360px}.side{display:flex}.deposit-card{padding:22px}h2{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><div class="mark">TSI</div><div><h1>TSI TRADE</h1><small>MARKET INTELLIGENCE</small></div></div>
+  <nav class="nav" aria-label="Main navigation">
+    <button id="dashboardTab" class="active" type="button">Dashboard</button>
+    <button id="depositTab" type="button">Deposit</button>
+  </nav>
+</header>
+
+<main id="dashboardPage">
+  <div class="layout">
+    <section class="card chartcard">
+      <div class="charthead"><div><div class="charttitle" id="chartPair">XAUUSD · Gold / US Dollar</div><div class="muted" style="font-size:12px">Market chart</div></div>
+        <div class="charttools">
+          <select id="symbol" class="select" aria-label="Market">
+            <option value="OANDA:XAUUSD">XAUUSD</option><option value="OANDA:EURUSD">EURUSD</option><option value="OANDA:GBPUSD">GBPUSD</option><option value="OANDA:USDJPY">USDJPY</option><option value="NASDAQ:AAPL">AAPL</option><option value="NASDAQ:MSFT">MSFT</option><option value="NASDAQ:TSLA">TSLA</option>
+          </select>
+          <select id="interval" class="select" aria-label="Chart interval"><option value="5">5m</option><option value="15">15m</option><option value="60" selected>1h</option><option value="240">4h</option><option value="D">1D</option></select>
+        </div>
+      </div>
+      <div class="tv" id="tv"></div>
+    </section>
+    <aside class="side">
+      <section class="card"><h3 class="sectiontitle">Market overview</h3><p class="market-note">Explore selected forex pairs, metals and equities using the interactive market chart.</p></section>
+      <section class="card"><h3 class="sectiontitle">Deposit portal</h3><p class="market-note">Ready to make a deposit enquiry? Enter your preferred amount and duration, then send the details to TSI Hire on Telegram.</p><button class="proceed" id="sideDeposit" type="button" style="margin-top:16px">Open deposit page →</button></section>
+      <section class="card"><h3 class="sectiontitle">Market information</h3><div class="symbol-list"><div class="symbol-item"><span>Gold</span><strong>XAUUSD</strong></div><div class="symbol-item"><span>Euro / US Dollar</span><strong>EURUSD</strong></div><div class="symbol-item"><span>Pound / US Dollar</span><strong>GBPUSD</strong></div><div class="symbol-item"><span>US Dollar / Yen</span><strong>USDJPY</strong></div></div></section>
+    </aside>
+  </div>
+</main>
+
+<main id="depositPage" class="hidden">
+  <section class="card deposit-wrap deposit-card">
+    <div class="eyebrow">Deposit request</div>
+    <h2>Enter your deposit details</h2>
+    <p class="intro">Choose the amount and duration you want to enquire about. Continue to Telegram to send the details to our team.</p>
+    <form id="depositForm">
+      <div class="field"><label for="amount">Amount (USD)</label><div class="amount-wrap"><span class="currency">$</span><input class="control" id="amount" name="amount" type="number" min="1" step="0.01" placeholder="Enter amount" required inputmode="decimal"></div></div>
+      <div class="field"><label for="duration">Duration</label><select class="control" id="duration" name="duration" required><option value="" disabled selected>Select duration</option><option value="1 day">1 day</option><option value="7 days">7 days</option><option value="14 days">14 days</option><option value="30 days">30 days</option><option value="60 days">60 days</option><option value="90 days">90 days</option></select></div>
+      <div class="summary" aria-live="polite"><div class="summary-row"><span>Selected amount</span><strong id="amountPreview">$0.00</strong></div><div class="summary-row"><span>Selected duration</span><strong id="durationPreview">Not selected</strong></div></div>
+      <button class="proceed" type="submit">Proceed to Telegram →</button><div class="error" id="error" role="alert"></div>
+    </form>
+    <p class="hint">Telegram opens with a message for you to review and send. No payment is taken on this page.</p>
+  </section>
+</main>
+<footer class="footnote">TSI Trade · Market charts provided by TradingView</footer>
+</div>
+<script>
+const dashboardPage=document.getElementById('dashboardPage'),depositPage=document.getElementById('depositPage');
+const dashboardTab=document.getElementById('dashboardTab'),depositTab=document.getElementById('depositTab');
+function showPage(page){const deposit=page==='deposit';dashboardPage.classList.toggle('hidden',deposit);depositPage.classList.toggle('hidden',!deposit);dashboardTab.classList.toggle('active',!deposit);depositTab.classList.toggle('active',deposit);window.scrollTo({top:0,behavior:'smooth'});}
+dashboardTab.addEventListener('click',()=>showPage('dashboard'));depositTab.addEventListener('click',()=>showPage('deposit'));document.getElementById('sideDeposit').addEventListener('click',()=>showPage('deposit'));
+function loadChart(){const symbol=document.getElementById('symbol').value,interval=document.getElementById('interval').value;document.getElementById('chartPair').textContent=symbol.replace('OANDA:','')+' · Market chart';document.getElementById('tv').innerHTML=`<iframe title="TradingView market chart" src="https://www.tradingview.com/widgetembed/?frameElementId=tvframe&symbol=${encodeURIComponent(symbol)}&interval=${encodeURIComponent(interval)}&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&withdateranges=1&hideideas=1&locale=en" allowfullscreen></iframe>`;}
+document.getElementById('symbol').addEventListener('change',loadChart);document.getElementById('interval').addEventListener('change',loadChart);loadChart();
+const amountInput=document.getElementById('amount'),durationInput=document.getElementById('duration'),amountPreview=document.getElementById('amountPreview'),durationPreview=document.getElementById('durationPreview'),error=document.getElementById('error');
+const formatAmount=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(value)||0);
+amountInput.addEventListener('input',()=>{amountPreview.textContent=formatAmount(amountInput.value);error.textContent='';});
+durationInput.addEventListener('change',()=>{durationPreview.textContent=durationInput.value||'Not selected';error.textContent='';});
+document.getElementById('depositForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number(amountInput.value),duration=durationInput.value;if(!Number.isFinite(amount)||amount<=0){error.textContent='Please enter an amount greater than zero.';amountInput.focus();return;}if(!duration){error.textContent='Please select a duration.';durationInput.focus();return;}const message=`Hello TSI Trade, I would like to make a deposit enquiry.\nAmount: ${formatAmount(amount)}\nDuration: ${duration}`;window.open(`https://t.me/tsi_hire?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');});
+</script>
+</body>
+</html>
